@@ -8,3 +8,5 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/0a4acc30a9ce440087f7688735359bb8)](https://www.codacy.com/app/drummeraidan_50/nfctools?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=fctaddia/nfctools&amp;utm_campaign=Badge_Grade)
 
 NfcTools simplifies reading and writing on NFC tags
+
+---
