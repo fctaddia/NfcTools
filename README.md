@@ -10,3 +10,5 @@
 NfcTools simplifies reading and writing on NFC tags
 
 ---
+
+![Showcase](https://raw.githubusercontent.com/fctaddia/NfcTools/master/art/screen_activity.png)
