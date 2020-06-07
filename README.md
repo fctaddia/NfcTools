@@ -16,7 +16,7 @@ NfcTools simplifies reading and writing on NFC tags
 
 ## NFC reading
 
-To read an NFC tag, an interface that is always listening to the NFC sensor is required.
+1) To read an NFC tag, an interface that is always listening to the NFC sensor is required.
 
 Listener.kt:
 
@@ -26,14 +26,13 @@ interface Listener {
     fun onDialogDismissed()
 }
 ```
-Implemented this interface, create the class for reading nfc. Created the class, extend it with the DialogFragment library:
-
+2) Implemented this interface, create the class for reading nfc. Created the class, extend it with the DialogFragment library:
 ```kotlin
 class NfcReaderFragment : DialogFragment() {
     ...
 }
 ```
-Extended the NfcReaderFragment class with DialogFragment you will be asked to override several functions:
+3) Extended the NfcReaderFragment class with DialogFragment you will be asked to override several functions:
 ```kotlin
 override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
     ...
@@ -46,5 +45,60 @@ override fun onAttach(context: Context) {
 override fun onDetach() {
     super.onDetach()
     ...
+}
+```
+4) Create the functions for the actual reading of nfc, which will be called each time the TAG NfcAdapter.ACTION_TAG_DISCOVERED is invoked:
+```kotlin
+companion object {
+    val TAG = NfcReaderFragment::class.java.simpleName
+    fun newInstance(): NfcReaderFragment { return NfcReaderFragment() }
+}
+
+fun onNfcDetected(ndef: Ndef) {
+    readFromNFC(ndef)
+}
+
+private fun readFromNFC(ndef: Ndef) {
+    try {
+        ndef.connect()
+        val ndefMessage : NdefMessage = ndef.ndefMessage
+        message = String(ndefMessage.records[0].payload)
+        Log.d(TAG, "readFromNFC: $message")
+        ndef.close()
+    } catch (e: IOException) {
+        e.printStackTrace()
+    } catch (e: FormatException) {
+        e.printStackTrace()
+    }
+}
+```
+## NFC writing
+
+To create the listener interface and main functions, follow steps 1,2,3. Obviously change the class name to NfcWriterFragment.
+
+Create the actual nfc write functions, which will be called each time TAG NfcAdapter.ACTION_TAG_DISCOVERED is called:
+```kotlin
+companion object {
+    val TAG = NfcWriterFragment::class.java.simpleName
+    fun newInstance(): NfcWriterFragment { return NfcWriterFragment() }
+}
+
+fun onNfcDetected(ndef: Ndef, messageToWrite: String) {
+    writeToNfc(ndef, messageToWrite)
+}
+
+private fun writeToNfc(ndef: Ndef?, message: String) {
+    if (ndef != null) {
+        try {
+            ndef.connect()
+            val mimeRecord = NdefRecord.createMime("NfcTools", message.toByteArray(Charset.forName("US-ASCII")))
+            ndef.writeNdefMessage(NdefMessage(mimeRecord))
+            ndef.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } catch (e: FormatException) {
+            e.printStackTrace()
+        }
+    }
 }
 ```
