@@ -13,3 +13,38 @@ NfcTools simplifies reading and writing on NFC tags
 ---
 
 <img src="https://raw.githubusercontent.com/fctaddia/NfcTools/master/art/screen_activity.png" alt="Showcase" height="300px">
+
+## NFC reading
+
+To read an NFC tag, an interface that is always listening to the NFC sensor is required.
+
+Listener.kt:
+
+```kotlin
+interface Listener {
+    fun onDialogDisplayed()
+    fun onDialogDismissed()
+}
+```
+Implemented this interface, create the class for reading nfc. Created the class, extend it with the DialogFragment library:
+
+```kotlin
+class NfcReaderFragment : DialogFragment() {
+    ...
+}
+```
+Extended the NfcReaderFragment class with DialogFragment you will be asked to override several functions:
+```kotlin
+override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    ...
+}
+
+override fun onAttach(context: Context) {
+    super.onAttach(context)
+    ...
+}
+override fun onDetach() {
+    super.onDetach()
+    ...
+}
+```
