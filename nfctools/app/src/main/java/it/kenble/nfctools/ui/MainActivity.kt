@@ -1,41 +1,49 @@
 package it.kenble.nfctools.ui
 
-import android.app.PendingIntent
+import android.nfc.Tag
+import android.util.Log
+import android.os.Bundle
+import android.widget.Toast
+import android.os.Parcelable
+import android.nfc.tech.Ndef
+import android.nfc.NfcAdapter
 import android.content.Intent
+import android.provider.Settings
+import android.app.PendingIntent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.nfc.NfcAdapter
-import android.nfc.Tag
-import android.nfc.tech.Ndef
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.os.Parcelable
-import android.provider.Settings
-import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.databinding.DataBindingUtil
+import androidx.appcompat.app.AppCompatActivity
+
 import it.kenble.nfctools.R
-import it.kenble.nfctools.databinding.ActivityMainBinding
 import it.kenble.nfctools.nfc.Listener
 import it.kenble.nfctools.nfc.NfcReaderFragment
 import it.kenble.nfctools.nfc.NfcWriterFragment
+import it.kenble.nfctools.databinding.ActivityMainBinding
 
-private val TAG = MainActivity::class.java.simpleName
-
+/**
+ * @author Francesco Taddia
+ * @see 'https://github.com/fctaddia/NfcTools'
+ */
 class MainActivity : AppCompatActivity(), Listener {
 
-    private lateinit var mainBind : ActivityMainBinding
-    private var nfcAdapter: NfcAdapter?= null
-    private var nfcread: NfcReaderFragment? = null
-    private var nfcwrite: NfcWriterFragment? = null
-    private var isDialogDisplayed : Boolean = false
+    // region Variables
+
     private var isWrite = false
+    private var nfcAdapter: NfcAdapter?= null
+    private var nfcRead: NfcReaderFragment? = null
+    private var nfcWrite: NfcWriterFragment? = null
+    private var isDialogDisplayed : Boolean = false
+    private lateinit var mainBind : ActivityMainBinding
+    private val tag = MainActivity::class.java.simpleName
+
+    // endregion
+
+    // region Lifecycle
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainBind = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        nfc() ; listeners()
+        init() ; listeners()
     }
 
     override fun onResume() {
@@ -45,14 +53,19 @@ class MainActivity : AppCompatActivity(), Listener {
         val ndefDetected = IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED)
         val techDetected = IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED)
         val nfcIntentFilter = arrayOf(techDetected, tagDetected, ndefDetected)
-        val pendingIntent = PendingIntent.getActivity(this@MainActivity, 0, Intent(this@MainActivity, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0)
-        if (nfcAdapter != null) nfcAdapter!!.enableForegroundDispatch(this, pendingIntent, nfcIntentFilter, null)
+        val pendingIntent = PendingIntent.getActivity(this@MainActivity, 0,
+            Intent(this@MainActivity, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0)
+        if (nfcAdapter != null) {
+            nfcAdapter!!.enableForegroundDispatch(this, pendingIntent, nfcIntentFilter, null)
+        }
     }
 
     override fun onPause() {
         super.onPause()
         refreshNfc()
-        if (nfcAdapter != null) nfcAdapter!!.disableForegroundDispatch(this)
+        if (nfcAdapter != null) {
+            nfcAdapter!!.disableForegroundDispatch(this)
+        }
     }
 
     override fun onDialogDisplayed() { isDialogDisplayed = true }
@@ -62,27 +75,47 @@ class MainActivity : AppCompatActivity(), Listener {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         val tag = intent.getParcelableExtra<Parcelable>(NfcAdapter.EXTRA_TAG)
-        Log.d(TAG, "onNewIntent: " + intent.action)
+        Log.d(this.tag, "onNewIntent: " + intent.action)
         if (tag != null) {
             Toast.makeText(this, getString(R.string.message_tag_detected), Toast.LENGTH_SHORT).show()
             val ndef = Ndef.get(tag as Tag?)
             if (isDialogDisplayed) {
                 if (isWrite) {
                     val messageToWrite = mainBind.etMessage.text.toString()
-                    nfcwrite = supportFragmentManager.findFragmentByTag(NfcWriterFragment.TAG) as NfcWriterFragment
-                    nfcwrite?.onNfcDetected(ndef, messageToWrite)
+                    nfcWrite = supportFragmentManager.findFragmentByTag(NfcWriterFragment.TAG) as NfcWriterFragment
+                    nfcWrite?.onNfcDetected(ndef, messageToWrite)
                 } else {
-                    nfcread = supportFragmentManager.findFragmentByTag(NfcReaderFragment.TAG) as NfcReaderFragment
-                    nfcread?.onNfcDetected(ndef)
+                    nfcRead = supportFragmentManager.findFragmentByTag(NfcReaderFragment.TAG) as NfcReaderFragment
+                    nfcRead?.onNfcDetected(ndef)
                 }
             }
         }
     }
 
-    private fun listeners() {
-        mainBind.btnRead.setOnClickListener { if(!isNfcEnabled()){alertNfcRead()} else { fragmentRead() } }
-        mainBind.btnWrite.setOnClickListener { if(!isNfcEnabled()){alertNfcWrite()} else { fragmentWrite() } }
+    // endregion
+
+    // region Init, Listeners
+
+    private fun init() {
+        mainBind = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(mainBind.root)
+        nfc()
     }
+
+    private fun listeners() {
+        mainBind.btnRead.setOnClickListener {
+            if(!isNfcEnabled()) { alertNfcRead() }
+            else { fragmentRead() }
+        }
+        mainBind.btnWrite.setOnClickListener {
+            if(!isNfcEnabled()) { alertNfcWrite() }
+            else { fragmentWrite() }
+        }
+    }
+
+    // endregion
+
+    // region Nfc
 
     private fun nfc() {
         val pm = packageManager
@@ -112,6 +145,23 @@ class MainActivity : AppCompatActivity(), Listener {
         } ; return false
     }
 
+    private fun fragmentWrite() {
+        isWrite = true
+        nfcWrite = supportFragmentManager.findFragmentByTag(NfcWriterFragment.TAG) as? NfcWriterFragment
+        if (nfcWrite == null) { nfcWrite = NfcWriterFragment.newInstance() }
+        nfcWrite?.show(supportFragmentManager, NfcWriterFragment.TAG)
+    }
+
+    private fun fragmentRead() {
+        nfcRead = supportFragmentManager.findFragmentByTag(NfcReaderFragment.TAG) as? NfcReaderFragment
+        if (nfcRead == null) { nfcRead = NfcReaderFragment.newInstance() }
+        nfcRead?.show(supportFragmentManager, NfcReaderFragment.TAG)
+    }
+
+    // endregion
+
+    // region Design
+
     private fun alertNfcWrite() {
         val dialogBuilder = AlertDialog.Builder(this)
         dialogBuilder.setMessage("Per poter scrivere sul TAG è necessario attivare l'NFC")
@@ -132,11 +182,11 @@ class MainActivity : AppCompatActivity(), Listener {
         val dialogBuilder = AlertDialog.Builder(this)
         dialogBuilder.setMessage("Per poter leggere un TAG è necessario attivare l'NFC")
             .setCancelable(false)
-            .setPositiveButton("Attiva") { dialog, _ ->
+            .setPositiveButton("Activate") { dialog, _ ->
                 startActivity(Intent(Settings.ACTION_NFC_SETTINGS))
                 dialog.dismiss()
             }
-            .setNegativeButton("Annulla") { dialog, _ ->
+            .setNegativeButton("Cancel") { dialog, _ ->
                 dialog.cancel()
             }
         val alert = dialogBuilder.create()
@@ -157,16 +207,6 @@ class MainActivity : AppCompatActivity(), Listener {
         alert.show()
     }
 
-    private fun fragmentWrite() {
-        isWrite = true
-        nfcwrite = supportFragmentManager.findFragmentByTag(NfcWriterFragment.TAG) as? NfcWriterFragment
-        if (nfcwrite == null) { nfcwrite = NfcWriterFragment.newInstance() }
-        nfcwrite?.show(supportFragmentManager, NfcWriterFragment.TAG)
-    }
+    // endregion
 
-    private fun fragmentRead() {
-        nfcread = supportFragmentManager.findFragmentByTag(NfcReaderFragment.TAG) as? NfcReaderFragment
-        if (nfcread == null) { nfcread = NfcReaderFragment.newInstance() }
-        nfcread?.show(supportFragmentManager, NfcReaderFragment.TAG)
-    }
 }
