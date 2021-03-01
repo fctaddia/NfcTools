@@ -1,32 +1,48 @@
 package it.kenble.nfctools.nfc
 
-import android.content.Context
-import android.nfc.FormatException
-import android.nfc.NdefMessage
-import android.nfc.NdefRecord
-import android.nfc.tech.Ndef
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
+import android.nfc.tech.Ndef
+import android.nfc.NdefRecord
 import android.view.ViewGroup
+import android.nfc.NdefMessage
+import android.content.Context
 import android.widget.ProgressBar
-import androidx.databinding.DataBindingUtil
+import android.nfc.FormatException
+import android.view.LayoutInflater
 import androidx.fragment.app.DialogFragment
+
 import it.kenble.nfctools.R
-import it.kenble.nfctools.databinding.FragmentWriteBinding
 import it.kenble.nfctools.ui.MainActivity
-import kotlinx.android.synthetic.main.fragment_write.view.*
+import it.kenble.nfctools.databinding.FragmentWriteBinding
+
 import java.io.IOException
 import java.nio.charset.Charset
 
+/**
+ * @author Francesco Taddia
+ * @see 'https://github.com/fctaddia/NfcTools'
+ */
 class NfcWriterFragment : DialogFragment() {
 
-    private lateinit var writeBind : FragmentWriteBinding
+    //region Variables
+
+    companion object {
+        val TAG: String = NfcWriterFragment::class.java.simpleName
+        fun newInstance(): NfcWriterFragment { return NfcWriterFragment() }
+    }
+
     private var listener : Listener? = null
     private var progress : ProgressBar? = null
+    private lateinit var writeBind : FragmentWriteBinding
+
+    // endregion
+
+    // region Lifecycle
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        writeBind = DataBindingUtil.inflate(inflater, R.layout.fragment_write,container,false) ; return writeBind.root
+        writeBind = FragmentWriteBinding.inflate(layoutInflater)
+        return writeBind.root
     }
 
     override fun onAttach(context: Context) {
@@ -35,31 +51,36 @@ class NfcWriterFragment : DialogFragment() {
         listener!!.onDialogDisplayed()
     }
 
-    override fun onDetach() { super.onDetach() ; listener!!.onDialogDismissed() }
+    override fun onDetach() {
+        super.onDetach()
+        listener!!.onDialogDismissed()
+    }
+
+    // endregion
+
+    // region Nfc
 
     fun onNfcDetected(ndef: Ndef, messageToWrite: String) { writeToNfc(ndef, messageToWrite) }
 
     private fun writeToNfc(ndef: Ndef?, message: String) {
-        writeBind.root.tv_message?.text = getString(R.string.message_write_progress)
+        writeBind.tvMessage.text = getString(R.string.message_write_progress)
         if (ndef != null) {
             try {
                 ndef.connect()
                 val mimeRecord = NdefRecord.createMime("NfcTools", message.toByteArray(Charset.forName("US-ASCII")))
                 ndef.writeNdefMessage(NdefMessage(mimeRecord))
                 ndef.close()
-                writeBind.root.tv_message!!.text = getString(R.string.message_write_success)
+                writeBind.tvMessage.text = getString(R.string.message_write_success)
             } catch (e: IOException) {
                 e.printStackTrace()
-                writeBind.root.tv_message!!.text = getString(R.string.message_write_error)
+                writeBind.tvMessage.text = getString(R.string.message_write_error)
             } catch (e: FormatException) {
                 e.printStackTrace()
-                writeBind.root.tv_message!!.text = getString(R.string.message_write_error)
+                writeBind.tvMessage.text = getString(R.string.message_write_error)
             }
         }
     }
 
-    companion object {
-        val TAG: String = NfcWriterFragment::class.java.simpleName
-        fun newInstance(): NfcWriterFragment { return NfcWriterFragment() }
-    }
+    // endregion
+
 }
