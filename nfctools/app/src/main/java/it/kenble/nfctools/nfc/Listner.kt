@@ -1,3 +1,10 @@
 package it.kenble.nfctools.nfc
 
-interface Listener { fun onDialogDisplayed() ; fun onDialogDismissed() }
+/**
+ * @author Francesco Taddia
+ * @see 'https://github.com/fctaddia/NfcTools'
+ */
+interface Listener {
+    fun onDialogDisplayed()
+    fun onDialogDismissed()
+}
