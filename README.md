@@ -9,9 +9,9 @@ NfcTools simplifies reading and writing on NFC tags
 [![License](https://img.shields.io/github/license/fctaddia/NfcTools?color=03DAC5&label=License)](https://opensource.org/licenses/MIT)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/2f1acba06d8d4224953814006836d199)](https://www.codacy.com/manual/fctaddia/NfcTools?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=fctaddia/NfcTools&amp;utm_campaign=Badge_Grade)
 
-## NFC reading
+### NFC reading
 
-1) To read an NFC tag, an interface that is always listening to the NFC sensor is required.
+1) To read an NFC tag, an interface that is always listening to the NFC sensor is required
 
 Listener.kt:
 
@@ -67,9 +67,9 @@ private fun readFromNFC(ndef: Ndef) {
     }
 }
 ```
-## NFC writing
+### NFC writing
 
-To create the listener interface and main functions, follow steps 1,2,3. Obviously change the class name to NfcWriterFragment.
+To create the listener interface and main functions, follow steps 1,2,3. Obviously change the class name to NfcWriterFragment
 
 Create the actual nfc write functions, which will be called each time TAG NfcAdapter.ACTION_TAG_DISCOVERED is called:
 ```kotlin
