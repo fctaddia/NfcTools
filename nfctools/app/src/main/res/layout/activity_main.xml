@@ -1,31 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-    <LinearLayout
-        android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.MainActivity">
+    <EditText
+        android:layout_marginTop="15dp"
+        android:id="@+id/et_message"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".ui.MainActivity">
-        <EditText
-            android:layout_marginTop="15dp"
-            android:id="@+id/et_message"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/hint_message"/>
-        <Button
-            android:id="@+id/btn_write"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/activity_horizontal_margin"
-            android:text="@string/message_write_tag"
-            style="@style/Widget.AppCompat.Button.Colored"/>
-        <Button
-            android:id="@+id/btn_read"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="60dp"
-            android:text="@string/message_read_tag"
-            style="@style/Widget.AppCompat.Button.Colored"/>
-    </LinearLayout>
-</layout>
+        android:layout_height="wrap_content"
+        android:hint="@string/hint_message"/>
+    <Button
+        android:id="@+id/btn_write"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:text="@string/message_write_tag"
+        style="@style/Widget.AppCompat.Button.Colored"/>
+    <Button
+        android:id="@+id/btn_read"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:text="@string/message_read_tag"
+        style="@style/Widget.AppCompat.Button.Colored"/>
+</LinearLayout>
