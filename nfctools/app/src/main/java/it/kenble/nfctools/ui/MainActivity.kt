@@ -140,9 +140,17 @@ class MainActivity : AppCompatActivity(), Listener {
 
     private fun isNfcEnabled(): Boolean {
         if (nfcAdapter != null) {
-            return try { nfcAdapter!!.isEnabled
-            } catch (exp: Exception) { try { nfcAdapter!!.isEnabled } catch (exp: Exception) { false } }
-        } ; return false
+            return try { 
+                nfcAdapter!!.isEnabled
+            } catch (exp: Exception) { 
+                try { 
+                    nfcAdapter!!.isEnabled 
+                } catch (exp: Exception) { 
+                    false 
+                } 
+            }
+        } 
+        return false
     }
 
     private fun fragmentWrite() {
