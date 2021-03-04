@@ -5,6 +5,7 @@ NfcTools simplifies reading and writing on NFC tags
 
 [![Kotlin](https://img.shields.io/badge/Kotlin-1.4.31-e60202.svg?style=flat-square)](http://kotlinlang.org)
 [![AndroidX](https://img.shields.io/badge/AndroidX-1.3.2-000000.svg?style=flat-square)](https://developer.android.com/jetpack/androidx/)
+[![GitHub (pre-)release](https://img.shields.io/github/v/release/fctaddia/nfctools.svg?color=f77200&label=Release&style=flat-square)](./../../releases)
 [![License](https://img.shields.io/github/license/fctaddia/NfcTools?color=03DAC5&label=License)](https://opensource.org/licenses/MIT)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/2f1acba06d8d4224953814006836d199)](https://www.codacy.com/manual/fctaddia/NfcTools?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=fctaddia/NfcTools&amp;utm_campaign=Badge_Grade)
 
