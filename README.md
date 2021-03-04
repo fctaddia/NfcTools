@@ -11,7 +11,7 @@ NfcTools simplifies reading and writing on NFC tags
 
 ### NFC reading
 
-1) To read an NFC tag, an interface that is always listening to the NFC sensor is required
+1)  To read an NFC tag, an interface that is always listening to the NFC sensor is required
 
 Listener.kt:
 
@@ -21,13 +21,13 @@ interface Listener {
     fun onDialogDismissed()
 }
 ```
-2) Implemented this interface, create the class for reading nfc. Created the class, extend it with the DialogFragment library:
+2)  Implemented this interface, create the class for reading nfc. Created the class, extend it with the DialogFragment library:
 ```kotlin
 class NfcReaderFragment : DialogFragment() {
     ...
 }
 ```
-3) Extended the NfcReaderFragment class with DialogFragment you will be asked to override several functions:
+3)  Extended the NfcReaderFragment class with DialogFragment you will be asked to override several functions:
 ```kotlin
 override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
     ...
@@ -42,7 +42,7 @@ override fun onDetach() {
     ...
 }
 ```
-4) Create the functions for the actual reading of nfc, which will be called each time the TAG NfcAdapter.ACTION_TAG_DISCOVERED is invoked:
+4)  Create the functions for the actual reading of nfc, which will be called each time the TAG NfcAdapter.ACTION_TAG_DISCOVERED is invoked:
 ```kotlin
 companion object {
     val TAG = NfcReaderFragment::class.java.simpleName
